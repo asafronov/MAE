@@ -146,7 +146,7 @@ setAgentsParams[] :=
 	        agentsProds[an] = producedProd;
 	        agentsCons[an] = consumedProd;
 			    
-            agentsParams[an, rProduce] = NotNeg /@ RandomVariate[CrProduce, productsN];
+            agentsParams[an, cRegen] = NotNeg /@ RandomVariate[CRegen, productsN];
 
 (*			linearCoefs = NotNeg /@ RandomVariate[CLinearProduce, productsN];
 *)			minCoefs = NotNeg /@ RandomVariate[CMinProduce, productsN];
@@ -193,7 +193,7 @@ printAgentParams[an_] :=
 		Print["Production function: ", prodFuncInd];
 		Print["Func coefs : " , Round2@agentsParams[an, paramName] ];
 		
-		Print["Daily regen: ", Round2@agentsParams[an, rProduce] ];
+		Print["Daily regen: ", Round2@agentsParams[an, cRegen] ];
 		Print["Start store: ", Round2@hAgentsGoodsStart[[an]]];
 		Print["Consume norm: ", Round2@agentsParams[an, norm] ];
 		Print["Lambda coef: ", Round2@agentsParams[an, lambda] ];

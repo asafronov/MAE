@@ -25,7 +25,7 @@ Protect[Strategy, Produce, Learn, Consume, CreateAction, Forecast];
 Protect[MarketNumber, Title, G1, G2, SessionsInDay, FirstPrice];
 
 
-rProduce::usage = "";
+cRegen::usage = "";
 prodFunc::usage = "";
 
 cLinear::usage = "";

@@ -31,7 +31,7 @@ NumberOfProducts -> 5 // PJ;
 AgentsAmount -> 10 // PJ;
 
 (* start amount of main product (index = 1, Money) *)
-StartMoney -> 30 // PJ;
+StartMoney -> 10 // PJ;
 
 (* index of production function, 0 = strProdRandom *)
 ProdFuncInd -> 1 // PJ;
@@ -40,7 +40,7 @@ ProdFuncInd -> 1 // PJ;
 SessionsInDay -> 2 // PJ;
 
 (* the price, which all markets start trading from: {a,b} <=> Random from a to b *)
-FirstPrice -> {5, 6} // PJ;
+FirstPrice -> {1, 2} // PJ;
 
 
 (* CONSTANTS *)
@@ -57,8 +57,11 @@ CLambdaRange = {0.1, 0.9};
 (* range of values (min, max) for cons Norm generations *)
 CNormRange = {0.1, 0.9};
 
-(* dist to generate daily produce; trancate with {? , 0} leads to no produce *)
-CrProduce = TruncatedDistribution[ {-1, 0}, NormalDistribution[0.0, 5.0] ];
+(* max discount part, which agents can apply to predicted price while selling *)
+CMaxDiscount = 0.1;
+
+(* dist to generate daily regeneration of resources; trancate with {? , 0} leads to no produce *)
+CRegen = TruncatedDistribution[ {-1, 3}, NormalDistribution[0.0, 5.0] ];
 
 (* dist to generate goods quality at start *)
 CQuantGoods = TruncatedDistribution[ {0, 20}, NormalDistribution[10, 8.5] ];

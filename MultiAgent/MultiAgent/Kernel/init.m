@@ -3,7 +3,7 @@ Needs[ "Notation`"]
 
 Get[ "MultiAgent`GlobalVars`"]
 Get[ "MultiAgent`History`"]
-(*Get[ "MultiAgent`DB`"]*)
+Get[ "MultiAgent`DB`"]
 
 Get[ "MultiAgent`ASide`"]
 Get[ "MultiAgent`Agents`"]

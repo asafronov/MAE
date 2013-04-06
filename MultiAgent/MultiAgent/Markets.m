@@ -80,13 +80,14 @@ addMarket[m_] :=
     ];
 
 getMarketNumber[g1_, g2_] :=
-	Module[ {gd1, gd2, mn, N},
+	Module[ {gd1, gd2, mn, N, ind},
 		If[g1 == g2, 
-			Return[$Failed]];		
+			Return 0];	
+				
 		gd1 = Min[g1, g2];
 		gd2 = Max[g1, g2];
-		N = Last@productsNums;
-		mn = Sum[N-i, {i, gd1 - 1}] + (gd2 - gd1);
+		N = Length@productsNums;
+		mn = Sum[N-ind, {ind, gd1 - 1}] + (gd2 - gd1);
 		mn
 	]
 

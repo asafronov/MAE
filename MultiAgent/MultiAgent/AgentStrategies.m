@@ -9,8 +9,7 @@ Begin["`Private`"]
 strProduceByConstant[an_, res_, c_] :=
 	Module[ {},
 		If[ agentsAlive[an],
-			goods[an, res] += c;
-			
+			goods[an, res] += c;			
 		]
 	]
 	
@@ -27,7 +26,7 @@ strConsumeByConstant[an_, res_, c_] :=
     
 
 strProduceByRandom[an_] :=
-    Module[ {r = agentsParams[an, rProduce]},
+    Module[ {r = agentsParams[an, cRegen]},
         MapThread[(goods[an, #1] += #2)&,
     		{productsNums, r}
         ] /; agentsAlive[an];
@@ -121,7 +120,7 @@ strTradeAllNeeded[an_] :=
 		prodGoodSize = goods[an, prodGood];
 		c1 = (cur != prodGood) && (prodGoodSize > CEpsAmount);
 		If[c1,
-			tryToSellByLastPrognose[getMarketNumber[cur, prodGood], an, prodGoodSize, False],
+			tryToSellByLastPrognose[getMarketNumber[cur, prodGood], an, prodGoodSize, True],
 				If[DebugTrade, Print[an, "-agent don't sell prod good ", prodGood, ", has it ", prodGoodSize, ", cur=", cur] ],
 					Print["ERROR C1"];
 		];
@@ -174,6 +173,26 @@ strAdaptivePrognose[an_] :=
 				
 		] /@ marketsNums;
 	];
+	
+estimateDiscount[mn_, an_] :=
+	Module[{curSize,  allDeals, anDeals, lastTraded, discount},
+		If[dayNumber == 1 && sessionNumber == 1, Return [0]];
+		
+		curSize = goods[an, marketGoods[mn][[2]] ];
+		allDeals = If[Length@Last@hMarketsDeals[[mn]] == 0, {}, Last@Last@(hMarketsDeals[[mn]]) ];
+		anDeals = Select[allDeals, #[[1]] == an&];
+		lastTraded = Total@anDeals[[All, 2, 2]];
+		
+		discount = Max[0.0, CMaxDiscount * (curSize - lastTraded) / curSize ];
+		
+		If[discount < 0 || discoint > 0.1,
+			Print["Big discount!", discount];
+		];
+		
+		discount
+	];
+	
+estimate 
 
 End[]
 

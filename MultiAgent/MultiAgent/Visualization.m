@@ -8,7 +8,7 @@ MAEVisAgentCurrency		::usage = "[an]: Shows how (an)-agent main curency is chang
 MAEVisAgentProduce		::usage = "[an]: Shows all production of (an)-agent";
 MAEVisAgentConsume		::usage = "[an]: Shows all consumption of (an)-agent";
 MAEVisAgentCapital		::usage = "[an]: Shows how (an)-agent portfolio cost is changing";
-MAEVisAgentProducts		::usage = "[an]: Shows (an)-agent storage";
+MAEVisAgentProducts		::usage = "[an]: Shows (an)-agent storage, claculated in it's main currency";
 MAEVisAgentsDifference	::usage = "[pc]: Shows (pc)richest to (pc)poorest ratio ";
 MAEVisAgentsHistogram	::usage = "[bn]: Shows histogram of agents' richness with (bn) beans";
 
@@ -117,19 +117,34 @@ MAEVisAgentCapital[an_] :=
     ]
         
 MAEVisAgentProducts[an_] :=
-    Module[ {hist},
+    Module[ {midprc, daystore, body = {}, res},
         If[!MemberQ[agentsNums, an], 
         	Throw["NoSuchAgent"] ];
+	
+        Function[dn,
+        	daystore = hAgentsGoods[[dn, an]];
+        	Function[pn,
+        		midprc = marketMeanPrice[getMarketNumber[ pn, hAgentsCurrency[[dn, an]] ], dn];
+        		daystore[[pn]] =  midprc * daystore[[pn]];
+        	] /@ productsNums;
         	
-        hist = { hAgentsGoodsStart[[an]] } ~ Join ~ hAgentsGoods[[All, an]];
+        	AppendTo[body, daystore];
+        ] /@ Range@dayN;
         
-        BarChart[hist, 
+        res = {
+	    	(	
+	    		If[# == hAgentsCurrency[[1, an]], 1, hMarketsPricesStart[[getMarketNumber[#, hAgentsCurrency[[1, an]]] ]] ] 
+	    			* hAgentsGoodsStart[[an, #]] 
+			) &/@ productsNums
+		} ~ Join ~ body;
+        
+        BarChart[res, 
         	ChartLayout -> "Stacked", 
 			ChartLegends -> Placed[productsNames, Above], 
 			ChartLabels -> {Placed[dayStr, Axis], {""}},
 			GridLines -> Automatic,
 			GridLinesStyle -> Directive[LightGray, Dashed], 
-			AxesLabel -> {"Day", "Amount"}, 
+			AxesLabel -> {"Day", "Valuation"}, 
 			PlotLabel -> "Agent " <> ToString[an]
 		]
     ]

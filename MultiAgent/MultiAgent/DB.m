@@ -18,6 +18,40 @@ Begin["`Private`"]
 
 Needs["DatabaseLink`"]
 
+openDB[db_: "localhost:3306/MA_DB"] :=
+    Module[ {user = "user", pass = "pass"},
+        closeDB[];
+        
+        conn = OpenSQLConnection[JDBC["mysql", db], "Username" -> user,
+           "Password" -> pass]
+    ]
+  
+closeDB[] :=
+    Module[ {},
+        If[ Head[conn] === SQLConnection,
+            CloseSQLConnection[conn];
+        ]
+    ];
+
+
+createSettingsRecords[] :=
+    Module[ {setId},
+        If[ Head[conn] === SQLConnection,
+        	setId = 1;
+        	
+            SQLInsert[conn, "PRODUCTS", {"index", "name", "settings_id"}, 
+				{#, ResourceList[[#]], setId}
+			] &/@ productsNums;
+          
+        ];
+    ];
+
+
+
+
+
+
+
 Options[LogIt] :=
     {StorageType -> DB}
 (*StorageType -> {PrintMessage, AppengToList, DB}*)
@@ -42,64 +76,16 @@ LogIt[type_, m___, OptionsPattern[]] :=
         Switch[type,
             "OrderPack",
                 {mn, an, t, qg1, qg2} = m;
+                
                 orderSave[mn, an, t, qg1, qg2, sessionNumber, dayNumber],
              _,
              	Print["I can't log message: ",m," with type = ",type];
    ]
     ];
 
-Clear[openDB, closeDB, freeDB];
-Clear[loadProducts, loadDBProductNames, loadMarkets, savePack, 
-  saveChange];
-
-openDB[db_: "localhost:5432/darkpoolt1"] :=
-    Module[ {user = "jok", pass = ""},
-        If[ Head[conn] === SQLConnection,
-            CloseSQLConnection[conn];
-        ];
-        conn = OpenSQLConnection[JDBC["PostgreSQL", db], "Username" -> user,
-           "Password" -> pass]
-    ]
-
-freeDB[] :=
-    Module[ {sqlexecfn = "/mnt/data/model/sql/createpg.sql", data},
-        sqlexecfn = filesql;
-        If[ Head[conn] === SQLConnection,
-            data = Import[sqlexecfn, "Text"];
-            data = StringReplace[ data, "/*" ~~ ShortestMatch[__] ~~ "*/" -> ""];
-            data = StringSplit[StringReplace[data, {"\n\n" -> "\n", "\n" -> ""}], 
-              "\n"];
-            SQLExecute[ conn, #] & /@ Select[data, # != "" &]
-        ]
-    ];
-  
-closeDB[] :=
-    Module[ {},
-        If[ Head[conn] === SQLConnection,
-            CloseSQLConnection[conn];
-        ]
-    ];
 
 
-createExampleDB[] :=
-    Module[ {exampleProducts},
-        If[ Head[conn] === SQLConnection,
-            exampleProducts[] :=
-                Module[ {},
-                    SQLInsert[conn, 
-                     "PRODUCTS", {"title", "description"}, 
-                         {{"Gold", ""}, {"Ferrum", ""}, {"Corn", ""},{"Paper",""}}]
-                ];
-            exampleProducts[]
-        ]
-    ];
 
-loadDBProductNames[] :=
-    Module[ {},
-        If[ Head[conn] === SQLConnection,
-            SQLSelect[conn, "PRODUCTS", {"title"}] // Flatten
-        ]
-    ];
 
 
 End[];

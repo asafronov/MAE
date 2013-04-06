@@ -52,6 +52,7 @@ startExchange[OptionsPattern[]] :=
 
         If[ firstSession,       	
 			executeActions[#, CreateActions] &/@ agentsNums;
+			hMarketsPricesStart = RandomReal[ OptionValue[markets[#], FirstPrice] ] &/@ marketsNums;
 			firstSession = False;
         ];
         

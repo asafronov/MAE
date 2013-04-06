@@ -13,9 +13,9 @@ sendBidOrderByCurSuze	::usage = "create bid order ";
 sendAskOrderByPrice		::usage = "create ask order by price and append it to list";
 sendBidOrderByPrice		::usage = "create bid order by price and append it to list";
 
-tryToSellByLastPrognose	::usage = "[mn, an, qty]: use lst prognosed price to sell (qty) on (mn)-market";
-tryToBuyByLastPrognose	::usage = "[mn, an, qty]: use +Random[] prognose to buy (qty) on (mn)-market";
-tryToBuyAllOnCash		::usage = "sends order to buy as much as we can on alowed cash, using prognosed price";
+tryToSellByLastPrognose	::usage = "[mn, an, qty, usedisc]: use prognosed price to sell (qty) on (mn)-market with discount, if (usedisc)";
+tryToBuyByLastPrognose	::usage = "[mn, an, qty]: use prognosed price to buy (qty) on (mn)-market";
+tryToBuyAllOnCash		::usage = "[mn, an, money]: sends order to buy as much as we can on alowed cash, using prognosed price";
 handleOrderBookDA		::usage = "handling of asks and bids, executes and declines orders";
 
 (* VARS *)
@@ -48,17 +48,17 @@ sendBidOrderByPrice[mn_, an_, qty_, prc_] :=
     AppendTo[marketsBids[mn], createOrder[mn, an, Bid, qty, prc]];
 
 tryToSellByLastPrognose[mn_, an_, qty_, usedisk_] :=
-    Module[ {prognosedPrice, lastDaySize},
-    	If[!usedisk,
-        	prognosedPrice = Last@hMarketsPrognoses[[mn, an]];
-        	sendAskOrderByPrice[mn, an, qty, prognosedPrice],
-        		lastDaySize = hMarketsDeals[[mn, dayNumber-1, All]];
-    	];
+    Module[ {prognosedPrice, disc},
+    	disc = If[!usedisk, 0, estimateDiscount[mn, an] ];
+    	prognosedPrice = Last@hMarketsPrognoses[[mn, an]];  	
+ 
+    	sendAskOrderByPrice[mn, an, qty, prognosedPrice * (1 - disc)];
     ];
 
 tryToBuyByLastPrognose[mn_, an_, qty_] :=
     Module[ {prognosedPrice},
         prognosedPrice = Last@hMarketsPrognoses[[mn, an]];
+        
         sendBidOrderByPrice[mn, an, qty, prognosedPrice]
     ];
     
@@ -67,6 +67,7 @@ tryToBuyAllOnCash[mn_, an_, money_] :=
         prognosedPrice = Last@hMarketsPrognoses[[mn, an]];
         If[prognosedPrice == 0, Print["DANGER! Pprc = 0"]];
         qty = money / prognosedPrice;
+        
         sendBidOrderByPrice[mn, an, qty, prognosedPrice]
     ];    
 

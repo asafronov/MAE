@@ -36,9 +36,6 @@ createProducts[OptionsPattern[]] :=
         ( prodByName[ productsNames[[#]] ] = # ) &/@ productsNums;      
     ]
 
-(* productsNums = loadDBProductNames[] *)
-
-
 initAgentProducts[na_] :=
     (goods[na, #] = 0) & /@ productsNums
 

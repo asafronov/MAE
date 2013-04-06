@@ -10,12 +10,14 @@ marketLastPrice		::usage = "[mn]: last traded price";
 marketMeanPrice		::usage = "[mn, dn]: average price on (mn)-market during (dn)-day";
  
 (* VARS *)
+hAgentsGoodsStart	::usage = "[[an]] [[good]] = amount, generated in the beginning";
+hMarketsPricesStart	::usage = "[[mn]] = price";
+
 hMarketsBooks		::usage = "[[mn]] [[day]] [[ses]] [[ask/bid]] = order";
 hMarketsPrices		::usage = "[[mn]] [[day]] [[ses]] = prc";
 hMarketsDeals		::usage = "[[mn]] [[day]] [[ses]] = deals; deal = {an, {delta1, delta2}}";
 hMarketsPrognoses	::usage = "[[mn]] [[an]] [[day]] = prog";
 
-hAgentsGoodsStart	::usage = "[[an]] [[good]] = amount, generated in the beginning";
 hAgentsGoods		::usage = "[[day]] [[an]] [[good]] = amount";
 hAgentsCurrency		::usage = "[[day]] [[an]] = currency";
 hAgentsCapitals		::usage = "[[day]] [[an]] = capital";
@@ -37,11 +39,13 @@ initHistoryVars[] :=
         hMarketsDeals = {};      
         hMarketsPrognoses = {};
         
-        hAgentsLastDay = {};
+        hAgentsGoodsStart = {};
+        hMarketsPricesStart = {};
+        
         hAgentsGoods = {};
         hAgentsCurrency = {};
         hAgentsCapitals = {};
-        
+        hAgentsLastDay = {};       
         hAgentsProduced = {};
         hAgentsConsumed = {};
         hTotalProduced = {};
@@ -79,7 +83,7 @@ marketLastPrice[g1_, g2_] :=
 marketLastPrice[mn_] :=
 	Module[{},
 		If[Length@First@hMarketsPrices[[mn]] == 0, 
-			RandomReal[ OptionValue[markets[mn], FirstPrice ] ],
+			hMarketsPricesStart[[mn]],
 				If[Length@Last@hMarketsPrices[[mn]] == 0,
 					Last@hMarketsPrices[[mn, -2]],
 						Last@Last@hMarketsPrices[[mn]]
@@ -89,6 +93,10 @@ marketLastPrice[mn_] :=
 	
 marketMeanPrice[mn_, dn_] :=
 	Module[{prices},
+		If[mn == 0,
+			Return [1]
+		];
+			
 		prices = hMarketsPrices[[mn, dn, All]];
 		Mean[prices]
 	];
