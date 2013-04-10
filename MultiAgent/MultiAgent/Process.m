@@ -6,8 +6,14 @@ BeginPackage["MultiAgent`"]
 initExchange::usage = "init variables associated with exchange";
 runExchange::usage = "main function that runs MAExchange";
 
+mainCurrencies	::usage = "main currency, which is designated with creating markets";
+agentsWeights	::usage = "[[an, pn]]: weight";
+
 dailyProds::usage = "";
 dailyCons::usage = "";
+
+consMetrics::usage = "";
+dealMetrics::usage = "";
 
 dayN::usage = "";
 sesN::usage = "";
@@ -29,6 +35,9 @@ initExchange[OptionsPattern[]] :=
 		dayNumber = 0;
         sessionNumber = 0;      
         firstSession = True;
+		
+		mainCurrencies = {};
+		agentsWeights = {};
         
         dailyProds = {};
         dailyCons = {};
@@ -38,7 +47,7 @@ runExchange[] :=
 	evaluateWithOpts[startExchange, PARAMS];
 
 startExchange[OptionsPattern[]] :=
-    Module[ {r},
+    Module[ {r, wts},
     	
     	setAgentsGoods[];
         initHistory[];
@@ -53,6 +62,9 @@ startExchange[OptionsPattern[]] :=
         If[ firstSession,       	
 			executeActions[#, CreateActions] &/@ agentsNums;
 			hMarketsPricesStart = RandomReal[ OptionValue[markets[#], FirstPrice] ] &/@ marketsNums;
+			wts = (1 / productsN) &/@ productsNums;
+			AppendTo[agentsWeights, wts] &/@ agentsNums;
+			
 			firstSession = False;
         ];
         
@@ -155,9 +167,20 @@ updateGoodHistory[] :=
     	AppendTo[hAgentsCapitals, getAgentCapital /@ agentsNums]; 
     	
     	AppendTo[hAgentsGoods, agentGoods /@ agentsNums];
+		AppendTo[hAgentsWeights, agentsWeights];
     	
     	dailyProds = (0 &/@ productsNums) &/@ agentsNums;
 		dailyCons = (0 &/@ productsNums) &/@ agentsNums;
+		
+		consMetrics = {};
+		dealMetrics = {};
+		Function[an,
+			AppendTo[consMetrics, Total@hAgentsConsumed[[dayNumber, an, All]] ];
+			AppendTo[dealMetrics, Length@Select[Flatten[hMarketsDeals[[All, dayNumber, All]], 2], First@# == an &] ];
+		] /@ agentsNums;
+		
+		AppendTo[hAgentsConsMetrics, consMetrics];
+		AppendTo[hAgentsDealMetrics, dealMetrics];
 ];
 	
 updateMarketHistory[mn_, day_, ses_, price_] :=

@@ -73,7 +73,7 @@ createAgents[OptionsPattern[]] :=
             	    	       		       	
         defstr = {
             {CreateAction, Hold@strProduceByConstant[AgentNUM, 1, OptionValue[StartMoney] ]},
-            {Learn, True},
+            {Learn, Hold@strLearnConsAndDeals[AgentNUM]},
             (*{Forecast, Hold@strRandomPrognose[AgentNUM]},*)
             {Forecast, Hold@strAdaptivePrognose[AgentNUM]},
             {Strategy, Hold@strTradeAllNeeded[AgentNUM]},

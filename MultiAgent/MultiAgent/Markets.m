@@ -19,8 +19,6 @@ marketsNums		::usage = "indexes of markets";
 marketGoods		::usage = "[mn] = {G1,G2} - used goods in cur market";
 marketSymbols	::usage = "[mn] = {gn1, gn2} ";
 
-mainCurrencies	::usage = "main currency, which is designated with creating markets";
-
 Options[testCurrencyMarket] :=
     {SessionsInDay -> 0, FirstPrice -> {0,0} };
     
@@ -39,8 +37,6 @@ initMarkets[] :=
         marketsNums = {};
         marketGoods = .;
         marketSymbols = .;
-        
-        mainCurrencies = {};
         
         marketsId = 0;
         marketsAsks = .;

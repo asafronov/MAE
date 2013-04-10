@@ -19,13 +19,17 @@ hMarketsDeals		::usage = "[[mn]] [[day]] [[ses]] = deals; deal = {an, {delta1, d
 hMarketsPrognoses	::usage = "[[mn]] [[an]] [[day]] = prog";
 
 hAgentsGoods		::usage = "[[day]] [[an]] [[good]] = amount";
-hAgentsCurrency		::usage = "[[day]] [[an]] = currency";
 hAgentsCapitals		::usage = "[[day]] [[an]] = capital";
 hAgentsLastDay		::usage = "last operating day, = +Inf if alive";
 hAgentsProduced		::usage = "[[day]] [[an]] [[good]] = produced amount";
 hAgentsConsumed		::usage = "[[day]] [[an]] [[good]] = consumed amount";
 hTotalProduced		::usage = "[[day]] [[good]] = total pruduced amount";
 hTotalConsumed		::usage = "[[day]] [[good]] = total consumed amount";
+
+hAgentsWeights		::usage = "[[day]] [[an]] [[good]] = weight";
+hAgentsCurrency		::usage = "[[day]] [[an]] = currency";
+hAgentsConsMetrics	::usage = "[[day]] [[an]] = val";
+hAgentsDealMetrics	::usage = "[[day]] [[an]] = val";
 
 hAuctionGraphs		::usage = "[[mn]] all double auctions on (mn)-market, indexed by day/ses";
 
@@ -43,13 +47,17 @@ initHistoryVars[] :=
         hMarketsPricesStart = {};
         
         hAgentsGoods = {};
-        hAgentsCurrency = {};
         hAgentsCapitals = {};
         hAgentsLastDay = {};       
         hAgentsProduced = {};
         hAgentsConsumed = {};
         hTotalProduced = {};
         hTotalConsumed = {};
+        
+		hAgentsWeights = {};
+        hAgentsCurrency = {};
+        hAgentsConsMetrics = {};
+        hAgentsDealMetrics = {};
         
         hAuctionGraphs = {};
     ]

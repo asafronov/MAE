@@ -186,13 +186,41 @@ estimateDiscount[mn_, an_] :=
 		discount = Max[0.0, CMaxDiscount * (curSize - lastTraded) / curSize ];
 		
 		If[discount < 0 || discoint > 0.1,
-			Print["Big discount!", discount];
+			Print["Error in discount!", discount];
 		];
 		
 		discount
 	];
 	
-estimate 
+strLearnConsAndDeals[an_] :=
+	Module[{lastDays, prevDays, consLast, dealLast, consPrev, dealPrev, case},
+		If[dayNumber > stratPeriod && Mod[dayNumber, stratPeriod] == 1,
+			
+			prevDays = Range[dayNumber - 2 * stratPeriod, dayNumber - stratPeriod - 1];
+			lastDays = Range[dayNumber - stratPeriod, dayNumber - 1];
+			
+			consPrev = (If[# <= 0, 0, hAgentsConsMetrics[[#, an]] ]) &/@ prevDays;
+			dealPrev = (If[# <= 0, 0, hAgentsDealMetrics[[#, an]] ]) &/@ prevDays;
+					
+			consLast = hAgentsConsMetrics[[#, an]] &/@ lastDays;
+			dealLast = hAgentsDealMetrics[[#, an]] &/@ lastDays;
+			
+			case = Which[consLast > consPrev && dealLast > dealPrev,  2, 
+						consLast > consPrev && dealLast == dealPrev,  1,
+						consLast == consPrev && dealLast > dealPrev,  1,
+						consLast < consPrev && dealLast == dealPrev, -1,
+						consLast == consPrev && dealLast < dealPrev, -1,
+						consLast < consPrev && dealLast < dealPrev,  -2,
+															True,	  0	];
+													    		
+    		
+		];
+	];
+	
+pushCurrency[an_, pn_] :=
+	Module[{},
+		
+	];
 
 End[]
 
