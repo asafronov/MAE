@@ -22,7 +22,7 @@ PJ[p_] :=
 MoneySystem = "Mono";
 
 (* number of days to simulate *)
-Days -> 5 // PJ;
+Days -> 30 // PJ;
 
 (* number of products, total, have to be more than NumRes *)
 NumberOfProducts -> 5 // PJ;
@@ -42,6 +42,9 @@ SessionsInDay -> 2 // PJ;
 (* the price, which all markets start trading from: {a,b} <=> Random from a to b *)
 FirstPrice -> {1, 2} // PJ;
 
+(* duration of a period for one strategy - in days *)
+StratPeriod -> 3 // PJ;
+
 
 (* CONSTANTS *)
 
@@ -52,22 +55,25 @@ ResourceList = {"Money", "Labor", "Water", "Energy", "Ferrum", "Gold", "Oil", "W
 ProdFunctions = {"Linear", "Min", "CD", "CES"};
 
 (* range of values (min, max) for lambda coefs genetations *)
-CLambdaRange = {0.1, 0.9};
+CLambdaRange = {0.2, 0.8};
 
 (* range of values (min, max) for cons Norm generations *)
-CNormRange = {0.1, 0.9};
+CNormRange = {0.4, 0.6};
 
 (* max discount part, which agents can apply to predicted price while selling *)
-CMaxDiscount = 0.1;
+CMaxDiscount = 0.2;
+
+(* step to increase or decrease pobability of strategy while learning *)
+CWeightStep = 0.1;
 
 (* dist to generate daily regeneration of resources; trancate with {? , 0} leads to no produce *)
 CRegen = TruncatedDistribution[ {-1, 3}, NormalDistribution[0.0, 5.0] ];
 
 (* dist to generate goods quality at start *)
-CQuantGoods = TruncatedDistribution[ {0, 20}, NormalDistribution[10, 8.5] ];
+CQuantGoods = TruncatedDistribution[ {0, 20}, NormalDistribution[10, 4] ];
 
 (* dist to generate coefs for linear production function *)
-CLinearProduce = TruncatedDistribution[ {0.1, 3}, NormalDistribution[1.2, 0.5] ];
+CLinearProduce = TruncatedDistribution[ {0.5, 3}, NormalDistribution[1.5, 0.5] ];
 
 (* dist to generate coefs for Min production function *)
 CMinProduce = TruncatedDistribution[ {0.1, 6}, NormalDistribution[4, 2] ];

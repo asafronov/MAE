@@ -8,7 +8,7 @@ MAEVisAgentCurrency		::usage = "[an]: Shows how (an)-agent main curency is chang
 MAEVisAgentProduce		::usage = "[an]: Shows all production of (an)-agent";
 MAEVisAgentConsume		::usage = "[an]: Shows all consumption of (an)-agent";
 MAEVisAgentCapital		::usage = "[an]: Shows how (an)-agent portfolio cost is changing";
-MAEVisAgentProducts		::usage = "[an]: Shows (an)-agent storage, claculated in it's main currency";
+MAEVisAgentProducts		::usage = "[an]: Shows (an)-agent storage, calculated in it's main currency";
 MAEVisAgentsDifference	::usage = "[pc]: Shows (pc)richest to (pc)poorest ratio ";
 MAEVisAgentsHistogram	::usage = "[bn]: Shows histogram of agents' richness with (bn) beans";
 

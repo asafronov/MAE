@@ -105,6 +105,7 @@ monoCurrencyMarkets[OptionsPattern[]] :=
         
         mainProd = 1;
         mainCurrencies = mainProd &/@ agentsNums;
+        oldCurrencies = 0 &/@ agentsNums;
         
         pairs = {mainProd, #} &/@ Delete[productsNums, mainProd];
         
@@ -125,6 +126,7 @@ multiCurrencyMarkets[OptionsPattern[]] :=
         
         mainProds = RandomChoice[productsNums, agentsN];
         mainCurrencies = mainProds;
+        oldCurrencies = 0 &/@ agentsNums;
         
         pairs = {};
         For[i = 1, i <= productsN, i++,

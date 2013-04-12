@@ -105,7 +105,8 @@ produceCD[an_] :=
 (* strategy function specific for market, send without Hold *)
 
 strTradeAllNeeded[an_] :=
-	Module[ {cur, money, norma, prodGood, prodGoodSize, consGood, paramName, compGoods, compN, c1, c2, c3, compProd},		
+	Module[ {oldcur, cur, money, norma, prodGood, prodGoodSize, consGood, paramName, compGoods, compN, c0, c1, c2, c3, compProd},		
+		oldcur = oldCurrencies[[an]];
 		cur = mainCurrencies[[an]];
 		money = goods[an, cur];
 		norma = agentsParams[an, norm];
@@ -116,6 +117,13 @@ strTradeAllNeeded[an_] :=
 		compGoods = Binary@agentsParams[an, paramName];
 		
 		If[DebugTrade, Print["-- D/S: " <> ToString@dayNumber <> "/" <> ToString@sessionNumber <> " --"] ];
+		
+		c0 = (oldcur != cur) && (goods[an, oldcur] > CEpsAmount);
+		If[c0,
+			tryToSellByLastPrognose[getMarketNumber[cur, oldcur], an, goods[an, oldcur], False],
+				If[DebugTrade, Print[an, "-agent don't sell old curr good ", oldcur, ", has it ", goods[an, oldcur], ", cur=", cur] ],
+					Print["ERROR C0"];
+		];
 		
 		prodGoodSize = goods[an, prodGood];
 		c1 = (cur != prodGood) && (prodGoodSize > CEpsAmount);
@@ -192,34 +200,85 @@ estimateDiscount[mn_, an_] :=
 		discount
 	];
 	
-strLearnConsAndDeals[an_] :=
-	Module[{lastDays, prevDays, consLast, dealLast, consPrev, dealPrev, case},
-		If[dayNumber > stratPeriod && Mod[dayNumber, stratPeriod] == 1,
+strLearnConsAndDeals[an_, period_] :=
+	Module[{lastDays, prevDays, consLast, dealLast, consPrev, dealPrev, case, cur, newcur, roulette, rand},
+		If[dayNumber <= period || Mod[dayNumber, period] != 1,
+			Return[]
+		];
 			
-			prevDays = Range[dayNumber - 2 * stratPeriod, dayNumber - stratPeriod - 1];
-			lastDays = Range[dayNumber - stratPeriod, dayNumber - 1];
-			
-			consPrev = (If[# <= 0, 0, hAgentsConsMetrics[[#, an]] ]) &/@ prevDays;
-			dealPrev = (If[# <= 0, 0, hAgentsDealMetrics[[#, an]] ]) &/@ prevDays;
-					
-			consLast = hAgentsConsMetrics[[#, an]] &/@ lastDays;
-			dealLast = hAgentsDealMetrics[[#, an]] &/@ lastDays;
-			
-			case = Which[consLast > consPrev && dealLast > dealPrev,  2, 
-						consLast > consPrev && dealLast == dealPrev,  1,
-						consLast == consPrev && dealLast > dealPrev,  1,
-						consLast < consPrev && dealLast == dealPrev, -1,
-						consLast == consPrev && dealLast < dealPrev, -1,
-						consLast < consPrev && dealLast < dealPrev,  -2,
-															True,	  0	];
-													    		
-    		
+		prevDays = Range[dayNumber - 2 * period, dayNumber - period - 1];
+		lastDays = Range[dayNumber - period, dayNumber - 1];
+		
+		consPrev = (If[# <= 0, 0, hAgentsConsMetrics[[#, an]] ]) &/@ prevDays // Total;
+		dealPrev = (If[# <= 0, 0, hAgentsDealMetrics[[#, an]] ]) &/@ prevDays // Total;
+				
+		consLast = hAgentsConsMetrics[[#, an]] &/@ lastDays // Total;
+		dealLast = hAgentsDealMetrics[[#, an]] &/@ lastDays // Total;
+		
+		case = Which[consLast > consPrev && dealLast > dealPrev,  2, 
+					consLast > consPrev && dealLast == dealPrev,  1,
+					consLast == consPrev && dealLast > dealPrev,  1,
+					consLast < consPrev && dealLast == dealPrev, -1,
+					consLast == consPrev && dealLast < dealPrev, -1,
+					consLast < consPrev && dealLast < dealPrev,  -2,
+														True,	  0	];
+												    		
+		cur = mainCurrencies[[an]];
+		Switch[case,
+			2, pushCurrency[an, cur, 1],
+			1, pushCurrency[an, cur, 0.5],
+			0, True,
+			-1, pullCurrency[an, cur, 0.5],
+			-2, pullCurrency[an, cur, 1]
+		];
+		
+		roulette = Accumulate@agentsWeights[[an]];
+		rand = Random[];
+		
+		newcur = Last@productsNums;
+		For[i = 1, i <= productsN, i++,
+			If[roulette[[i]] >= rand,
+				newcur = i;
+				Break[];
+			];
+		];
+		
+		mainCurrencies[[an]] = newcur;
+		oldCurrencies[[an]] = cur;
+	];
+	
+pushCurrency[an_, pn_, coef_] :=
+	Module[{inc, dec, sum},
+		inc = coef * CWeightStep;
+		dec = inc / (productsN - 1);
+		
+		For[i = 1, i <= productsN, i++,
+			If[i == pn, agentsWeights[[an,i]] += inc,
+				 agentsWeights[[an,i]] -= dec
+			];
+		];
+		
+		sum = Total@agentsWeights[[an]];
+		If[sum != 1, 
+			Print["Sum Ws != 1. an:", an, " pn:", pn] 
 		];
 	];
 	
-pushCurrency[an_, pn_] :=
-	Module[{},
+pullCurrency[an_, pn_, coef_] :=
+	Module[{inc, dec, sum},
+		dec = coef * CWeightStep;
+		inc = dec / (productsN - 1);
 		
+		For[i = 0, i < productsN, i++,
+			If[i == pn, agentsWeights[[an,i]] -= dec,
+				 agentsWeights[[an,i]] += inc
+			];
+		];
+		
+		sum = Total@agentsWeights[[an]];
+		If[sum != 1, 
+			Print["Sum Ws != 1. an:", an, " pn:", pn] 
+		];
 	];
 
 End[]

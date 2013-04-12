@@ -6,20 +6,20 @@ BeginPackage["MultiAgent`"]
 initExchange::usage = "init variables associated with exchange";
 runExchange::usage = "main function that runs MAExchange";
 
+(* VARS *)
+
 mainCurrencies	::usage = "main currency, which is designated with creating markets";
+oldCurrencies 	::usage = "";
 agentsWeights	::usage = "[[an, pn]]: weight";
 
-dailyProds::usage = "";
-dailyCons::usage = "";
-
-consMetrics::usage = "";
-dealMetrics::usage = "";
-
-dayN::usage = "";
-sesN::usage = "";
-
-daySesStr::usage = "";
-dayStr::usage = "";
+dailyProds	::usage = "";
+dailyCons	::usage = "";
+consMetrics	::usage = "";
+dealMetrics	::usage = "";
+dayN		::usage = "";
+sesN		::usage = "";
+daySesStr	::usage = "";
+dayStr		::usage = "";
 
 Options[startExchange] :=
     {Days -> 1};
@@ -35,8 +35,10 @@ initExchange[OptionsPattern[]] :=
 		dayNumber = 0;
         sessionNumber = 0;      
         firstSession = True;
+        currencyChanged = False;
 		
 		mainCurrencies = {};
+		oldCurrencies = {};
 		agentsWeights = {};
         
         dailyProds = {};
@@ -62,6 +64,7 @@ startExchange[OptionsPattern[]] :=
         If[ firstSession,       	
 			executeActions[#, CreateActions] &/@ agentsNums;
 			hMarketsPricesStart = RandomReal[ OptionValue[markets[#], FirstPrice] ] &/@ marketsNums;
+			
 			wts = (1 / productsN) &/@ productsNums;
 			AppendTo[agentsWeights, wts] &/@ agentsNums;
 			

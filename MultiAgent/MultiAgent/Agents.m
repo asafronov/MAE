@@ -26,7 +26,7 @@ agentsProds		::usage = "produced goods";
 agentsCons		::usage = "consumed goods";
 
 Options[createAgents] := {
-	AgentsAmount -> 0, StartMoney -> 0, ProdFuncInd -> 0
+	AgentsAmount -> 0, StartMoney -> 0, ProdFuncInd -> 0, StratPeriod -> 0
 };
 
 Begin["`Private`"]
@@ -66,14 +66,16 @@ createAgent[strats___, OptionsPattern[]] :=
     ];
     
 createAgents[OptionsPattern[]] :=
-    Module[ {agents, agCount, prodF, defstr = {}},
+    Module[ {agents, money, agCount, prodF, period, defstr = {}},
         agents = {};
+        money = OptionValue[StartMoney];
         agCount = OptionValue[AgentsAmount];
         prodF = OptionValue[ProdFuncInd];
+        period = OptionValue[StratPeriod];
             	    	       		       	
         defstr = {
-            {CreateAction, Hold@strProduceByConstant[AgentNUM, 1, OptionValue[StartMoney] ]},
-            {Learn, Hold@strLearnConsAndDeals[AgentNUM]},
+            {CreateAction, Hold@strProduceByConstant[AgentNUM, 1, money]},
+            {Learn, Hold@strLearnConsAndDeals[AgentNUM, period]},
             (*{Forecast, Hold@strRandomPrognose[AgentNUM]},*)
             {Forecast, Hold@strAdaptivePrognose[AgentNUM]},
             {Strategy, Hold@strTradeAllNeeded[AgentNUM]},
